@@ -47,8 +47,8 @@ public class Mago extends Eroi{
                 1,
                 inv,
                 110,
-                30,  // 10
-                5  // 7
+                10,  
+                7  
         );
         return mago;
     };
