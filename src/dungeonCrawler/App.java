@@ -19,14 +19,12 @@ public class App {
 
     public static void main(String[] args) {
 
-
         Logger log = Logger.getInstance();
 
         Goblin goblin = Goblin.generateGoblin();
         Scheletro scheletro = Scheletro.generateSkeleton();
         Orco orco = Orco.generateOrc();
         Drago drago = Drago.generateDragon();
-
 
         PersonaggioNonGiocante png = null;
 
@@ -35,7 +33,6 @@ public class App {
         Guerriero guerriero = null;
         Mago mago = null;
         Elfo elfo = null;
-
 
         int maxLife;
         int initialMagicAttack = 0;
@@ -46,7 +43,6 @@ public class App {
         for (int i = 0; i < heroes.length; i++) {
             System.out.println((i + 1) + " - " + heroes[i]);
         }
-
 
         // SCELTA DELL'EROE
         log.grey("fai la tua scelta: ");
@@ -95,7 +91,6 @@ public class App {
                 scanner.nextLine(); // pulisce il buffer
             }
         }
-
 
         // SCELTA DELLE PORTE
         do {
@@ -161,7 +156,6 @@ public class App {
                     continue;
 
                     //PORTA CENTRALE************************
-
                 case 2:
                     stringDoor = "Hai scelto la porta centrale";
                     log.blue(stringDoor);
@@ -248,7 +242,6 @@ public class App {
                             } else
                                 System.out.print("");
                         }
-
                     } else if (scelta > 5 && scelta <= 9) {
                         damage(eroe);
 
@@ -268,14 +261,10 @@ public class App {
                         break; // Uscita dal ciclo se era un drago e non è scappato
                     }
                     continue;
-
                 default:
                     log.yellow("Inserisci un valore da 1 a 3:");
             }
-
         } while ((!(mostro instanceof Drago) || mostro.getVita() > 0) && eroe.getLivello() < 11);
-
-
     }
 
     // DANNO DI 1
@@ -300,7 +289,6 @@ public class App {
                         Logger.getInstance().magent("Hai subito " + mostro.getAttacco() / difesa + " di danno");
                     }
                     break;
-
                 case 2:
                     if (difesa == 1) {
                         Logger.getInstance().yellow("Subirai la metà dei danni");
@@ -364,8 +352,6 @@ public class App {
                             }
 
                         } while (true);
-
-
                     } else {
                         System.out.println("Il tuo inventario è vuoto, inserisci un altra azione \n");
                         break;
@@ -391,13 +377,11 @@ public class App {
                     } else {
                         Logger.getInstance().yellow("Scegli un valore da 1 a 5");
                     }
-
             }
         } while (mostro.getVita() > 0 && eroe.getVita() > 0);
 
         return false;  // Non è scappato
     }
-
 
     // SCELTA DELLA PORTA
     public static String choiceDoor() {
@@ -408,7 +392,6 @@ public class App {
         }
         return porta;
     }
-
 
     public static Oggetti dropObject(Eroi eroe) {
         Oggetti oggetto = Eroi.findObject();
