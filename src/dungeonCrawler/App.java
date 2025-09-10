@@ -1,8 +1,6 @@
 package dungeonCrawler;
 
-import PNG.Fabbro;
-import PNG.Guaritore;
-import PNG.Mercante;
+
 import PNG.PersonaggioNonGiocante;
 import personaggi.eroi.Elfo;
 
@@ -12,10 +10,18 @@ import personaggi.eroi.Mago;
 import personaggi.mostri.*;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
+//import java.util.logging.Logger;
 
 public class App {
+
+    private static final Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
+
+
+        Logger log = Logger.getInstance();
 
         Goblin goblin = Goblin.generateGoblin();
         Scheletro scheletro = Scheletro.generateSkeleton();
@@ -34,107 +40,120 @@ public class App {
 
         int maxLife;
         int initialMagicAttack = 0;
+        int difesa = 1;
 
         String[] heroes = {"Guerriero", "Mago", "Elfo"};
-        System.out.println("Scegli un personaggio: ");
+        log.grey("Scegli un personaggio: ");
         for (int i = 0; i < heroes.length; i++) {
             System.out.println((i + 1) + " - " + heroes[i]);
         }
 
 
         // SCELTA DELL'EROE
-        System.out.println("fai la tua scelta: ");
-        Scanner scanner = new Scanner(System.in);
+        log.grey("fai la tua scelta: ");
 
         while (true) {
-            int input = scanner.nextInt();
-            switch (input) {
-                case 1:
-                    guerriero = Guerriero.choiceWarrior();
-                    System.out.println("");
-                    System.out.println(guerriero);
-                    eroe = guerriero;
-                    maxLife = eroe.getVita();
-                    break;
+            try {
+                int input = scanner.nextInt();
+                switch (input) {
+                    case 1:
+                        scanner.nextLine();
+                        guerriero = Guerriero.choiceWarrior(scanner);
+                        System.out.println();
+                        System.out.println(guerriero);
+                        eroe = guerriero;
+                        maxLife = eroe.getVita();
+                        break;
 
-                case 2:
-                    mago = Mago.choiceWizard();
-                    System.out.println("");
-                    System.out.println(mago);
-                    eroe = mago;
-                    initialMagicAttack = mago.getAttaccoMagico();
-                    maxLife = eroe.getVita();
-                    break;
+                    case 2:
+                        scanner.nextLine();
+                        mago = Mago.choiceWizard(scanner);
+                        System.out.println();
+                        System.out.println(mago);
+                        eroe = mago;
+                        initialMagicAttack = mago.getAttaccoMagico();
+                        System.out.println(initialMagicAttack);
+                        maxLife = eroe.getVita();
+                        break;
 
-                case 3:
-                    elfo = Elfo.choiceElf();
-                    System.out.println("");
-                    System.out.println(elfo);
-                    eroe = elfo;
-                    initialMagicAttack = elfo.getAttaccoMagico();
-                    maxLife = eroe.getVita();
+                    case 3:
+                        scanner.nextLine();
+                        elfo = Elfo.choiceElf(scanner);
+                        System.out.println();
+                        System.out.println(elfo);
+                        eroe = elfo;
+                        initialMagicAttack = elfo.getAttaccoMagico();
+                        maxLife = eroe.getVita();
+                        break;
 
-                    break;
-                default:
-                    System.out.println("Scelta non valida. Inserisci un altro valore: ");
-                    continue;
+                    default:
+                        log.yellow("Scelta non valida. Inserisci un altro valore da 1 a 3: ");
+                        continue;
+                }
+                break; // esce solo se la scelta è valida
+            } catch (InputMismatchException e) {
+                log.yellow("Devi inserire un numero!");
+                scanner.nextLine(); // pulisce il buffer
             }
-            break;
         }
+
 
         // SCELTA DELLE PORTE
         do {
-            System.out.println("Scegli una porta: \n" + choiceDoor());
-            Scanner scanner2 = new Scanner(System.in);
-            int input = scanner2.nextInt();
+            log.grey("Scegli una porta:");
+            System.out.println(choiceDoor());
+            int input = scanner.nextInt();
             boolean isEscaped = false;
+            String sconfitta = "Sei stato sconfitto!";
 
             switch (input) {
                 // PORTA DI SINISTRA ************************
                 case 1:
-                    System.out.println("Hai scelto la porta di sinistra");
+                    String stringDoor = "Hai scelto la porta di sinistra";
+                    log.blue(stringDoor);
+
                     int scelta = (int) (Math.random() * 19) + 1;
 
                     if (scelta > 0 && scelta <= 5) {
-                        mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
-                        int difesa = 1; // Necessario per modificare l'attacco del mostro
-                        System.out.println("E' uscito un " + mostro.getClass().getSimpleName() + "\n");
+                        if (eroe.getLivello() <= 9) {
+                            mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
+                        } else {
+                            mostro = Drago.generateDragon();
+                        }
+                        difesa = 1; // Necessario per modificare l'attacco del mostro
+                        log.red("E' uscito un " + mostro.getClass().getSimpleName());
                         isEscaped = battle(scanner, eroe, mostro, difesa, maxLife);
-                        System.out.println("\n");
+                        System.out.print("\n");
                         if (eroe.getVita() <= 0) {
-                            System.out.println("Sei stato sconfitto");
+                            log.red(sconfitta);
                             return;
                         } else {
                             if (!isEscaped) {
-                                eroe.setLivello(eroe.getLivello() + 1);
-                                if (eroe instanceof Mago) {
-                                    mago.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
-                                } else if (eroe instanceof Elfo) {
-                                    elfo.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
+                                if (mostro instanceof Drago) {
+                                    System.out.println("CONGRATULAZIONI HAI COMPLETATO IL GIOCO!!!");
+                                    return;
                                 }
-                                System.out.println("Il tuo livello è salito a: " + eroe.getLivello());
+                                eroe.setLivello(eroe.getLivello() + 1);
+                                eroe.calcolaAttaccoMagico(initialMagicAttack, eroe);
+                                log.green("Il tuo livello è salito a: " + eroe.getLivello());
                                 dropObject(eroe);
-                            } else {
-                                System.out.println("Sei fuggito! \n");
-                            }
+                            } else
+                                System.out.print("");
                         }
 
                     } else if (scelta > 5 && scelta <= 9) {
-                        System.out.println("L'eroe subisce un danno di 1");
-                        eroe.setVita(eroe.getVita() - 1);
-                        System.out.println(eroe.getVita());
+                        damage(eroe);
 
                     } else if (scelta > 9 && scelta <= 12) {
-                        System.out.println("Incontro con un PNG");
+                        log.cyan("\nIncontro con un PNG");
                         png = PersonaggioNonGiocante.insertPng();
-                        actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
+                        png.actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
 
                     } else if (scelta > 12 && scelta <= 17) {
-                        System.out.println("Stanza vuota");
+                        System.out.println("Stanza vuota \n");
 
                     } else {
                         Oggetti drop = dropObject(eroe);
-                        System.out.println("Hai ricevuto: " + drop);
                     }
 
                     if (!isEscaped && mostro == drago) {
@@ -143,51 +162,53 @@ public class App {
                     continue;
 
                     //PORTA CENTRALE************************
+
                 case 2:
-                    System.out.println("Hai scelto la porta centrale");
+                    stringDoor = "Hai scelto la porta centrale";
+                    log.blue(stringDoor);
+
                     scelta = (int) (Math.random() * 19) + 1;
 
                     if (scelta > 0 && scelta <= 5) {
-                        mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
-                        int difesa = 1; // Necessario per modificare l'attacco del mostro
-                        System.out.println("E' uscito un " + mostro.getClass().getSimpleName() + "\n");
+                        if (eroe.getLivello() <= 9) {
+                            mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
+                        } else {
+                            mostro = Drago.generateDragon();
+                        }
+                        difesa = 1; // Necessario per modificare l'attacco del mostro
+                        log.red("E' uscito un " + mostro.getClass().getSimpleName());
                         isEscaped = battle(scanner, eroe, mostro, difesa, maxLife);
+                        System.out.print("\n");
                         if (eroe.getVita() <= 0) {
-                            System.out.println("Sei stato sconfitto");
+                            log.red(sconfitta);
                             return;
                         } else {
                             if (!isEscaped) {
-                                eroe.setLivello(eroe.getLivello() + 1);
-                                if (eroe instanceof Mago) {
-                                    mago.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
-                                } else if (eroe instanceof Elfo) {
-                                    elfo.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
+                                if (mostro instanceof Drago) {
+                                    System.out.println("CONGRATULAZIONI HAI COMPLETATO IL GIOCO!!!");
+                                    return;
                                 }
-                                System.out.println("Il tuo livello è salito a: " + eroe.getLivello());
+                                eroe.setLivello(eroe.getLivello() + 1);
+                                eroe.calcolaAttaccoMagico(initialMagicAttack, eroe);
+                                log.green("Il tuo livello è salito a: " + eroe.getLivello());
                                 dropObject(eroe);
-                            } else {
-                                System.out.println("Sei fuggito! \n");
-                            }
+                            } else
+                                System.out.print("");
                         }
 
                     } else if (scelta > 5 && scelta <= 9) {
-                        System.out.println("L'eroe subisce un danno di 1");
-                        eroe.setVita(eroe.getVita() - 1);
-                        System.out.println(eroe.getVita());
+                        damage(eroe);
 
                     } else if (scelta > 9 && scelta <= 12) {
-                        System.out.println("Incontro con un PNG");
+                        log.cyan("\nIncontro con un PNG");
                         png = PersonaggioNonGiocante.insertPng();
-                        actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
-
-                        System.out.println(eroe.getInventario());
+                        png.actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
 
                     } else if (scelta > 12 && scelta <= 17) {
-                        System.out.println("Stanza vuota");
+                        System.out.println("Stanza vuota \n");
 
                     } else {
                         Oggetti drop = dropObject(eroe);
-                        System.out.println("Hai ricevuto: " + drop);
                     }
 
                     if (!isEscaped && mostro == drago) {
@@ -197,48 +218,51 @@ public class App {
 
                     //PORTA DI DESTRA **************************
                 case 3:
-                    System.out.println("Hai scelto la porta di destra");
+                    stringDoor = "Hai scelto la porta di destra";
+                    log.blue(stringDoor);
+
                     scelta = (int) (Math.random() * 19) + 1;
 
                     if (scelta > 0 && scelta <= 5) {
-                        mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
-                        int difesa = 1; // Necessario per modificare l'attacco del mostro
-                        System.out.println("E' uscito un " + mostro.getClass().getSimpleName() + "\n");
+                        if (eroe.getLivello() <= 9) {
+                            mostro = Mostri.insertMonster(goblin, scheletro, orco, drago);
+                        } else {
+                            mostro = Drago.generateDragon();
+                        }
+                        difesa = 1; // Necessario per modificare l'attacco del mostro
+                        log.red("E' uscito un " + mostro.getClass().getSimpleName());
                         isEscaped = battle(scanner, eroe, mostro, difesa, maxLife);
+                        System.out.print("\n");
                         if (eroe.getVita() <= 0) {
-                            System.out.println("Sei stato sconfitto");
+                            log.red(sconfitta);
                             return;
                         } else {
                             if (!isEscaped) {
-                                eroe.setLivello(eroe.getLivello() + 1);
-                                if (eroe instanceof Mago) {
-                                    mago.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
-                                } else if (eroe instanceof Elfo) {
-                                    elfo.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
+                                if (mostro instanceof Drago) {
+                                    System.out.println("CONGRATULAZIONI HAI COMPLETATO IL GIOCO!!!");
+                                    return;
                                 }
-                                System.out.println("Il tuo livello è salito a: " + eroe.getLivello());
+                                eroe.setLivello(eroe.getLivello() + 1);
+                                eroe.calcolaAttaccoMagico(initialMagicAttack, eroe);
+                                log.green("Il tuo livello è salito a: " + eroe.getLivello());
                                 dropObject(eroe);
-                            } else {
-                                System.out.println("Sei fuggito! \n");
-                            }
+                            } else
+                                System.out.print("");
                         }
 
                     } else if (scelta > 5 && scelta <= 9) {
-                        System.out.println("L'eroe subisce un danno di 1");
-                        eroe.setVita(eroe.getVita() - 1);
-                        System.out.println(eroe.getVita());
+                        damage(eroe);
 
                     } else if (scelta > 9 && scelta <= 12) {
-                        System.out.println("Incontro con un PNG");
+                        log.cyan("\nIncontro con un PNG");
                         png = PersonaggioNonGiocante.insertPng();
-                        actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
+                        png.actionPNG(eroe, png, maxLife, guerriero, mago, elfo);
 
                     } else if (scelta > 12 && scelta <= 17) {
-                        System.out.println("Stanza vuota");
+                        System.out.println("Stanza vuota \n");
 
                     } else {
                         Oggetti drop = dropObject(eroe);
-                        System.out.println("Hai ricevuto: " + drop);
                     }
 
                     if (!isEscaped && mostro == drago) {
@@ -247,14 +271,20 @@ public class App {
                     continue;
 
                 default:
-                    System.out.println("Inserisci un valore da 1 a 3:");
+                    log.yellow("Inserisci un valore da 1 a 3:");
             }
 
-        } while ((!(mostro instanceof Drago) || mostro.getVita() > 0) && eroe.getLivello() < 10);
+        } while ((!(mostro instanceof Drago) || mostro.getVita() > 0) && eroe.getLivello() < 11);
 
-        System.out.println("CONGRATULAZIONI HAI COMPLETATO IL GIOCO!!!");
+
     }
 
+    // DANNO DI 1
+    static void damage(Eroi eroe) {
+        Logger.getInstance().magent("\n" + eroe.getClasse() + " subisce un danno di 1");
+        eroe.setVita(eroe.getVita() - 1);
+        System.out.println("HP: " + eroe.getVita() + "\n");
+    }
 
     // METODO DELLA BATTAGLIA CON UN MOSTRO
     static boolean battle(Scanner scanner, Eroi eroe, Mostri mostro, int difesa, int maxLife) {
@@ -268,15 +298,18 @@ public class App {
                     Eroi.attack(eroe, mostro);
                     if (mostro.getVita() > 0) {
                         Mostri.monsterAttack(eroe, mostro, difesa);
+                        Logger.getInstance().magent("Hai subito " + mostro.getAttacco() / difesa + " di danno");
                     }
                     break;
 
                 case 2:
                     if (difesa == 1) {
+                        Logger.getInstance().yellow("Subirai la metà dei danni");
                         difesa++;
                         Mostri.monsterAttack(eroe, mostro, difesa);
+                        Logger.getInstance().magent("Hai subito " + mostro.getAttacco() / difesa + " di danno");
                     } else {
-                        System.out.println("Puoi aumentare la tua difesa una volta per avversario \n");
+                        Logger.getInstance().yellow("Puoi aumentare la tua difesa una volta per avversario \n");
                     }
                     break;
                 case 3:
@@ -298,7 +331,7 @@ public class App {
                         do {
                             try {
                                 inp = scanner.nextInt();
-                                if (inp == 0){
+                                if (inp == 0) {
                                     break;
                                 }
                                 if ((newInventario.get(inp - 1)).equals(Oggetti.POZIONE)) {
@@ -328,8 +361,7 @@ public class App {
                                     break;
                                 }
                             } catch (IndexOutOfBoundsException iobEx) {
-                                System.out.println("Inserisci un valore corretto");
-                                scanner.nextLine(); // questo pulisce
+                                Logger.getInstance().yellow("Inserisci un valore corretto");
                             }
 
                         } while (true);
@@ -347,13 +379,18 @@ public class App {
                 case 5:
                     if (eroe instanceof Mago || eroe instanceof Elfo) {
                         Eroi.magicAttack(eroe, mostro);
-                        Mostri.monsterAttack(eroe, mostro, difesa);
-                    }
+                        if (mostro.getVita() > 0) {
+                            Mostri.monsterAttack(eroe, mostro, difesa);
+                            Logger.getInstance().magent("Hai subito " + mostro.getAttacco() / difesa + " di danno");
+                        }
+                    } else
+                        Logger.getInstance().yellow("Scegli un valore da 1 a 4");
+                    break;
                 default:
                     if (eroe instanceof Guerriero) {
-                        System.out.println("Scegli un valore da 1 a 4");
+                        Logger.getInstance().yellow("Scegli un valore da 1 a 4");
                     } else {
-                        System.out.println("Scegli un valore da 1 a 5");
+                        Logger.getInstance().yellow("Scegli un valore da 1 a 5");
                     }
 
             }
@@ -374,39 +411,20 @@ public class App {
     }
 
 
-    public static Eroi actionPNG(Eroi eroe, PersonaggioNonGiocante png, int maxLife, Guerriero guerriero, Mago mago, Elfo elfo) {
-        if (png instanceof Guaritore) {
-            System.out.println(((Guaritore) png).getMessage());
-            Guaritore.cureHealer(eroe, maxLife);
-            return eroe;
-        } else if (png instanceof Fabbro) {
-            System.out.println(((Fabbro) png).getMessage());
-            Fabbro.increaseAttack(eroe, guerriero, mago, elfo);
-
-            return eroe;
-        } else {
-            if (eroe.getInventario().contains(Oggetti.MONETA)) {
-                System.out.println(((Mercante)png).getMessage() + "\n");
-                Oggetti oggetto = Mercante.sendObject(eroe);
-
-                if (oggetto != null) {
-
-                    eroe.getInventario().add(oggetto);
-                    eroe.getInventario().remove(Oggetti.MONETA);
-                    System.out.println(eroe.getInventario());
-                }
-            } else {
-                System.out.println("Non hai monete, al momento non puoi acquistare! \n");
-            }
-
-            return eroe;
-        }
-    }
-
     public static Oggetti dropObject(Eroi eroe) {
         Oggetti oggetto = Eroi.findObject();
+        String string = "Hai ricevuto una: ";
+        Logger.getInstance().green(string + oggetto);
+        if (oggetto == Oggetti.POZIONE)
+            Logger.getInstance().green("Permette di recuperare la vita di 25 HP");
+        else if (oggetto == Oggetti.BOMBA)
+            Logger.getInstance().green("Infligge un danno di 35 HP al mostro");
+        else
+            Logger.getInstance().green("Permette di acquistare oggetti dal mercante");
+
         eroe.getInventario().add(oggetto);
-        System.out.println(eroe.getInventario());
+        System.out.println("Inventario: " + eroe.getInventario() + "\n");
+
         return oggetto;
     }
 
@@ -417,6 +435,5 @@ public class App {
                 System.out.println(i++ + " - " + ogg);
         }
     }
-
 
 }

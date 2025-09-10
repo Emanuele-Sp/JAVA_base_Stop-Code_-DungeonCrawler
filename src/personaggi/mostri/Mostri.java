@@ -30,7 +30,8 @@ public class Mostri extends Creature {
     }
 
     public static Mostri insertMonster(Goblin goblin, Scheletro scheletro, Orco orco, Drago drago) {
-        int random = (int) (Math.random() * 4);
+//          int random = (int) (Math.random() * 4);
+        int random = 2;
 
         switch (random) {
             case 0:
@@ -53,7 +54,6 @@ public class Mostri extends Creature {
     public static Eroi monsterAttack(Eroi eroe, Mostri mostro, int difesa) {
         int nowLifeHero = eroe.getVita();
         eroe.setVita(nowLifeHero - mostro.getAttacco() / difesa);
-        System.out.println(eroe.getVita());
         return eroe;
     }
 

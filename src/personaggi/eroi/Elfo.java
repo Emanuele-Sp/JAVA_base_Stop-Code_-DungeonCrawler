@@ -1,6 +1,8 @@
 package personaggi.eroi;
 
+import dungeonCrawler.Logger;
 import dungeonCrawler.Oggetti;
+import personaggi.mostri.Mostri;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +35,8 @@ public class Elfo extends Eroi{
         this.attaccoMagico = attaccoMagico;
     }
 
-    public static Elfo choiceElf() {
-        Scanner scanner = new Scanner(System.in);
+    public static Elfo choiceElf(Scanner scanner) {
+
         System.out.println("Inserisci il nome del tuo Elfo:");
         String nome = Eroi.insertNameHero(scanner);
         ArrayList<Oggetti> inv = new ArrayList<>(Arrays.asList(Oggetti.MONETA));
@@ -49,6 +51,31 @@ public class Elfo extends Eroi{
         );
         return elfo;
     };
+
+    @Override
+    public void attacco(Mostri mostro) {
+        int newLifeMonster = mostro.getVita() - this.getAttacco();
+        mostro.setVita(newLifeMonster);
+        if (newLifeMonster > 0)
+            Logger.getInstance().yellow(mostro.getClasse() + " ha ora " + newLifeMonster + " punti vita.");
+        else
+            Logger.getInstance().red(mostro.getClasse() + " è stato sconfitto");
+    }
+
+    @Override
+    public void attaccoMagico(Mostri mostro) {
+        int newLifeMonster = mostro.getVita() - this.getAttaccoMagico();
+        mostro.setVita(newLifeMonster);
+        if (newLifeMonster > 0)
+            Logger.getInstance().yellow(mostro.getClasse() + " ha ora " + newLifeMonster + " punti vita.");
+        else
+            Logger.getInstance().red(mostro.getClasse() + " è stato sconfitto");
+    }
+
+    @Override
+    public void calcMagickAttack(int initialMagicAttack, Eroi eroe ){
+        this.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
+    }
 
     @Override
     public String toString(){

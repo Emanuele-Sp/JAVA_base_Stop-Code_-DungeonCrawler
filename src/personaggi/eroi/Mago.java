@@ -1,6 +1,8 @@
 package personaggi.eroi;
 
+import dungeonCrawler.Logger;
 import dungeonCrawler.Oggetti;
+import personaggi.mostri.Mostri;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +17,7 @@ public class Mago extends Eroi{
         super(classe, nome, livello, inventario, vita);
         this.attacco = attacco;
         this.attaccoMagico = attaccoMagico;
+
     }
 
     public int getAttacco() {
@@ -33,8 +36,8 @@ public class Mago extends Eroi{
         this.attaccoMagico = attaccoMagico;
     }
 
-    public static Mago choiceWizard() {
-        Scanner scanner = new Scanner(System.in);
+    public static Mago choiceWizard(Scanner scanner) {
+
         System.out.println("Inserisci il nome del tuo Mago:");
         String nome = Eroi.insertNameHero(scanner);
         ArrayList<Oggetti> inv = new ArrayList<>(Arrays.asList(Oggetti.MONETA));
@@ -44,11 +47,36 @@ public class Mago extends Eroi{
                 1,
                 inv,
                 110,
-                10,
-                7
+                30,  // 10
+                5  // 7
         );
         return mago;
     };
+
+    @Override
+    public void attacco(Mostri mostro) {
+        int newLifeMonster = mostro.getVita() - this.getAttacco();
+        mostro.setVita(newLifeMonster);
+        if (newLifeMonster > 0)
+            Logger.getInstance().yellow(mostro.getClasse() + " ha ora " + newLifeMonster + " punti vita.");
+        else
+            Logger.getInstance().red(mostro.getClasse() + " è stato sconfitto");
+    }
+
+    @Override
+    public void attaccoMagico(Mostri mostro) {
+        int newLifeMonster = mostro.getVita() - this.getAttaccoMagico();
+        mostro.setVita(newLifeMonster);
+        if (newLifeMonster > 0)
+            Logger.getInstance().yellow(mostro.getClasse() + " ha ora " + newLifeMonster + " punti vita.");
+        else
+            Logger.getInstance().red(mostro.getClasse() + " è stato sconfitto");
+    }
+
+    @Override
+    public void calcMagickAttack(int initialMagicAttack, Eroi eroe ){
+        this.setAttaccoMagico(initialMagicAttack * eroe.getLivello());
+    }
 
     @Override
     public String toString(){

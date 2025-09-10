@@ -1,5 +1,6 @@
 package PNG;
 
+import dungeonCrawler.Logger;
 import personaggi.eroi.Elfo;
 import personaggi.eroi.Eroi;
 import personaggi.eroi.Guerriero;
@@ -31,7 +32,7 @@ public class Fabbro extends PersonaggioNonGiocante{
     public static Fabbro generateLocksmith(){
         Fabbro fabbro = new Fabbro(
                 "PNG Fabbro",
-                "Ho affilata la tua arma, il tuo attacco è aumentato permanentemente di 5 \n"
+                "Ho affilata la tua arma, il tuo attacco è aumentato permanentemente di 5"
         );
         return fabbro;
     }
@@ -51,8 +52,14 @@ public class Fabbro extends PersonaggioNonGiocante{
     }
 
     @Override
+    public void azioneDelPng(Eroi eroe, PersonaggioNonGiocante png, int maxLife, Guerriero guerriero, Mago mago, Elfo elfo){
+        Logger.getInstance().yellow(((Fabbro) png).getMessage());
+        Fabbro.increaseAttack(eroe, guerriero, mago, elfo);
+    }
+
+    @Override
     public String toString() {
-        return message + '\''
+        return message + '\n'
                 ;
     }
 }
