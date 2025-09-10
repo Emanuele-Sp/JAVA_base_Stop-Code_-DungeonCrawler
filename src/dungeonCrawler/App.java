@@ -290,7 +290,7 @@ public class App {
     static boolean battle(Scanner scanner, Eroi eroe, Mostri mostro, int difesa, int maxLife) {
         do {
             System.out.println("HP " + eroe.getClasse() + ": " + eroe.getVita() + " - " +
-                    "HP " + mostro.getClasse() + ": " + mostro.getVita());
+                    "HP " + mostro.getClasse() + ": " + mostro.getVita() + " ATK: " + mostro.getAttacco());
             System.out.println(Eroi.choiceAction(eroe));
             int inputAction = scanner.nextInt();
             switch (inputAction) {
