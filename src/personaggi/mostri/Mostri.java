@@ -30,8 +30,8 @@ public class Mostri extends Creature {
     }
 
     public static Mostri insertMonster(Goblin goblin, Scheletro scheletro, Orco orco, Drago drago) {
-//          int random = (int) (Math.random() * 4);
-        int random = 2;
+          int random = (int) (Math.random() * 4);
+       
 
         switch (random) {
             case 0:
