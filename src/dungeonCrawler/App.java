@@ -269,7 +269,8 @@ public class App {
 
     // DANNO DI 1
     static void damage(Eroi eroe) {
-        Logger.getInstance().magent("\n" + eroe.getClasse() + " subisce un danno di 1");
+       Logger.getInstance().red("Sei caduto in una trappola");
+        Logger.getInstance().magent(eroe.getClasse() + " subisce un danno di 1");
         eroe.setVita(eroe.getVita() - 1);
         System.out.println("HP: " + eroe.getVita() + "\n");
     }
